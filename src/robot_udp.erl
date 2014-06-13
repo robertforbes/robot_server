@@ -3,12 +3,14 @@
     start_server/0,
     start_server/1,
     start_udp_serial_server/1,
+    start_udp_serial_server/3,
     display_controls/1,
     client/2,
     client/3]).
 
 -define(SERVER_HOST, "localhost").
 -define(SERVER_PORT, 1995).
+-define(SERIAL_BAUD, 9600).
 
 start_server() ->
     start_server(fun display_packet/1).
@@ -17,11 +19,14 @@ start_server(PktFun) ->
     spawn(fun() -> server(?SERVER_PORT, PktFun) end).
 
 start_udp_serial_server(SerialDevice) ->
-    SP = serial:start([{speed,115200},{open,SerialDevice}]),
+    start_udp_serial_server(SerialDevice, ?SERIAL_BAUD, ?SERVER_PORT).
+
+start_udp_serial_server(SerialDevice, Baud, Port) ->
+    SP = serial:start([{speed,Baud},{open,SerialDevice}]),
     Drive = fun(<<Speed:8, Direction:8>>) ->
                 robot:drive(SP, Speed, Direction)
             end,
-    spawn(fun() -> server(?SERVER_PORT, Drive) end).
+    spawn(fun() -> server(Port, Drive) end).
 
 %% The server.
 
