@@ -12,4 +12,4 @@ EFLAGS = -I../include
 # Do not edit below this line                                         #
 #######################################################################
 #Include following generic make script
-include Makefile.erlang
+include Makefile.inc
